@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<script src="https://d3js.org/d3.v5.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="anim.js"></script>
+
+<body>
+    <div id="main">
+        <div id="kanji_table">
+            <ul></ul>
+        </div>
+        <object id="svg" data="data/kanji/0f9a8.svg" type="image/svg+xml"></object>
+        <form onsubmit="return getValue('kanji_input')">
+            <input type="text" name="kanji_input" id="kanji_input" maxlength="5"
+                pattern="/[\u3000-\u303F]|[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u2605-\u2606]|[\u2190-\u2195]|\u203B/g"><br>
+            <input type="submit" value="Draw">
+        </form>
+        <div class="card">
+            <!-- Dummy svg to draw kanji one stroke at a time -->
+            <svg id="dummy-svg" xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109">
+                <g id="kvg:StrokePaths_dummy"
+                    style="fill:none;stroke: #000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">
+                </g>
+            </svg>
+        </div>
+    </div>
+
+</body>
+
+</html>

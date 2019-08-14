@@ -1,0 +1,85 @@
+#svg {
+    visibility: hidden;
+}
+
+.card {
+    background: #da9f56;
+    border-radius: 20px;
+    display: inline-block;
+    height: 235px;
+    margin: 1rem;
+    position: fixed;
+    width: 235px;
+    top: 40%;
+    -webkit-transform: translateY(-30%);
+    -ms-transform: translateY(-30%);
+    transform: translateY(-30%);
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+#dummy-svg {
+    position: absolute;
+    top: 27%;
+    -webkit-transform: translateY(-30%);
+    -ms-transform: translateY(-30%);
+    transform: translateY(-30%);
+    left: 27%;
+    -webkit-transform: translateX(-25%);
+    -ms-transform: translateX(-25%);
+    transform: translateX(-25%);
+    transform: scale(2);
+}
+
+.kanjiMenu {
+    list-style-type: none;
+}
+
+/* #kanji_table {
+    width: 30%;
+    height: auto;
+    margin-left: 0%;
+    margin-top: 10%;
+    margin-right: auto;
+    background-color: red;
+    padding: 8px;
+
+} */
+
+body {
+    background-color: #e8dcab;
+}
+
+input[type=text] {
+    position: absolute;
+    top: 23%;
+    left: 47.8%;
+    padding: 5px;
+    border: 2px solid #ccc;
+    -webkit-border-radius: 5px;
+    border-radius: 6%;
+    height: 10.393%;
+    width: 4.71%;
+    font-size: 72px;
+    text-align: center;
+}
+
+input[type=text]:focus {
+    border-color: rgb(34, 34, 34);
+}
+
+input[type=submit] {
+    position: absolute;
+    top: 37%;
+    left: 47.6%;
+    font-size: 15px;
+    width: 6.521%;
+    padding: 5px;
+    background: grey;
+    border: 0 none;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
