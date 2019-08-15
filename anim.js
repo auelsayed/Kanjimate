@@ -1,3 +1,5 @@
+// Abdelrahman Elsayed
+
 // Provided by the user McDowell from the following StackOverflow question
 // https://stackoverflow.com/questions/21647928/javascript-unicode-string-to-hex
 String.prototype.hexEncode = function () {
@@ -26,6 +28,7 @@ function showErrorTooltip() {
 function resetDrawingBoard(dummySvg, erase_panels) {
     while (dummySvg.firstChild) {
         dummySvg.removeChild(dummySvg.firstChild);
+
     }
     if (document.styleSheets.length > 1) {
         var styles = document.querySelectorAll("style");
@@ -95,8 +98,6 @@ window.onload = function () {
 
 function drawKanji(svgObject, kanjiID) {
     var svg = svgObject.lastChild;
-    // Hide original kanji such that only the animated one appears
-    // svg.style.visibility = "hidden";
 
     var strokeNumbers = svgObject.getElementById(`kvg:StrokeNumbers_${kanjiID}`);
 
@@ -107,7 +108,7 @@ function drawKanji(svgObject, kanjiID) {
 
 
     // Get all the paths to draw individual strokes
-    var strokePaths = svgObject.getElementById(`kvg:${kanjiID}`);
+    var strokePaths = svgObject.getElementById(`kvg:StrokePaths_${kanjiID}`);
     var paths = strokePaths.querySelectorAll("path");
 
     var dummySvg = document.getElementById('kvg:StrokePaths_dummy');
@@ -128,15 +129,20 @@ function drawKanji(svgObject, kanjiID) {
 
         if (dummySvg.firstChild || document.styleSheets.length > 1) {
             var XMLObject = document.getElementById('svg');
-
             resetDrawingBoard(dummySvg, false);
             XMLObject.setAttributeNS("", 'data', XMLObject.getAttributeNS("", "data"));
-            drawKanji(svgObject, kanjiID);
+            var svgObjectCopy = XMLObject.contentDocument;
+
+            drawKanji(svgObjectCopy, kanjiID);
         }
     }
     var time = slider.value;
     var currTime = 0;
     var animTime = (0.8 / 0.75) * time;
+
+    function colorElements(currPath, style) {
+
+    }
 
 
     // CSS animation of SVG heavily inspired by Jae Johns
@@ -144,16 +150,45 @@ function drawKanji(svgObject, kanjiID) {
     // https://medium.theuxblog.com/the-ultimate-guide-to-animating-drawn-text-in-html-with-css-no-jquery-needed-bcdcfdb963d8
     for (var i = 0; i < paths.length; i++) {
         // main kanji drawing panel
-        currPath = paths[i]
-        dummySvg.appendChild(paths[i]);
-
+        let currPath = paths[i]
+        let clonedPath = currPath.cloneNode(false)
+        dummySvg.appendChild(clonedPath);
+        // Element highlight when clicking on individual strokes
+        clonedPath.onmouseover = function () {
+            var parentNode = currPath.parentNode;
+            var elemChildren = parentNode.children;
+            for (var i = 0; i < elemChildren.length; i++) {
+                let child = document.getElementById(elemChildren[i].id)
+                child.style.stroke = "red";
+            }
+        };
+        clonedPath.onmouseout = function () {
+            var parentNode = currPath.parentNode;
+            var elemChildren = parentNode.children;
+            for (var i = 0; i < elemChildren.length; i++) {
+                let child = document.getElementById(elemChildren[i].id)
+                child.style.stroke = "black";
+            }
+        }
+        clonedPath.onclick = function () {
+            var parentNode = currPath.parentNode;
+            var elemChildren = parentNode.children;
+            for (var i = 0; i < elemChildren.length; i++) {
+                let child = document.getElementById(elemChildren[i].id)
+                setTimeout(function () {
+                    child.style.stroke = "red";
+                }, 200);
+                setTimeout(function () {
+                    child.style.stroke = "black";
+                }, 5000);
+            }
+        };
         var length = currPath.getTotalLength();
-        currId = paths[i].id.replace(':', "\\:");
-        style.innerHTML += `#dummy-svg #${currId} {stroke-dasharray: ${length} ; stroke-dashoffset: ${length}; animation: anim-${currId} ${time}s linear ${currTime}s forwards;}`;
-        style.innerHTML += `@keyframes anim-${currId} {from {stroke-dasharray: ${-length};} to {stroke-dashoffset: 0;} }`;
+        var currId = paths[i].id.replace(':', "\\:");
+        style.innerHTML += `#dummy-svg #${currId} {visibility: hidden; stroke-dasharray: ${length} ; stroke-dashoffset: ${length}; animation: anim-${currId} ${time}s linear ${currTime}s forwards;}`;
+        style.innerHTML += `@keyframes anim-${currId} {from {visibility: visible; stroke-dasharray: ${-length};} to {visibility: visible; stroke-dashoffset: 0;} }`;
         document.body.appendChild(style);
         currTime += animTime;
-
         // stroke panels
 
         var panelSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");

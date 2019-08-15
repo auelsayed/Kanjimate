@@ -1,5 +1,8 @@
+/* Abdelrahman Elsayed */
+
 #svg {
     visibility: hidden;
+    position: fixed;
 }
 
 .card {
@@ -8,7 +11,7 @@
     display: inline-block;
     height: 31.3%;
     margin: 1rem;
-    position: fixed;
+    position: absolute;
     width: 16.08%;
     top: 40%;
     -webkit-transform: translateY(-30%);
@@ -136,25 +139,27 @@ input[type=submit] {
 }
 
 .slidecontainer {
-    position: fixed;
+    position: absolute;
     width: 30%;
+    height: 3%;
     margin-top: 25.5%;
     margin-left: 61%;
 
 }
 
 .slider {
-    position: fixed;
+    position: absolute;
     -webkit-appearance: none;
-    height: 2%;
+    height: 100%;
     border-radius: 20px;
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;
     -webkit-transition: .2s;
     transition: opacity .2s;
-    width: 19.5%;
+    width: 65.5%;
     top: 57.5%;
+    margin-top: -2%;
     margin-left: 0%;
 
 }
@@ -167,7 +172,7 @@ input[type=submit] {
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    height: 160%;
+    /* height: 160%; */
     width: 8%;
     border-radius: 50%;
     background: #4CAF50;
@@ -177,24 +182,25 @@ input[type=submit] {
 .slider::-moz-range-thumb {
     -webkit-appearance: none;
     appearance: none;
-    height: 160%;
+    /* height: 560%; */
     border-radius: 50%;
-    width: 8%;
+    height: 120%;
+    width: 10%;
     background: #4CAF50;
     cursor: pointer;
 }
 
 #sliderText {
-    position: fixed;
-    right: 19.5%;
-    top: 60%;
+    position: absolute;
+    margin-left: 1%;
+    margin-top: 5%;
     font-size: 120%;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 
 }
 
 h1 {
-    position: fixed;
+    position: absolute;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     left: 41.2%;
     top: 3%;
@@ -203,7 +209,8 @@ h1 {
 
 h2 {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    position: fixed;
-    top: 48%;
-    right: 21.9%;
+    position: absolute;
+    font-size: 160%;
+    margin-top: -8%;
+    margin-left: 5.5%;
 }
