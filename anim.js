@@ -12,7 +12,18 @@ String.prototype.hexEncode = function () {
     return result;
 }
 
-function resetDrawingBoard(dummySvg) {
+function showErrorTooltip() {
+    var tooltip = document.getElementsByClassName("error-tooltip")[0];
+    tooltip.oninput = function () {
+        this.cusoninput = setCustomValidity('')
+    };
+    tooltip.style.visibility = "visible";
+    setTimeout(function () {
+        tooltip.style.visibility = "hidden";
+    }, 5000);
+}
+
+function resetDrawingBoard(dummySvg, erase_panels) {
     while (dummySvg.firstChild) {
         dummySvg.removeChild(dummySvg.firstChild);
     }
@@ -23,7 +34,7 @@ function resetDrawingBoard(dummySvg) {
             parentNode.removeChild(styles[i])
         }
     }
-    if (document.querySelectorAll(".kanji_panel".length > 0)) {
+    if (document.querySelectorAll(".kanji_panel".length > 0) && erase_panels) {
         var panels = document.querySelectorAll(".kanji_panel");
         for (var i = 0; i < panels.length; i++) {
             document.body.removeChild(panels[i]);
@@ -35,43 +46,57 @@ function resetDrawingBoard(dummySvg) {
 // Provided by Anonymous from the following StackOverflow question
 // https://stackoverflow.com/questions/22116017/how-to-pass-a-user-entered-form-value-from-html-to-javascript/22116162
 function getValue(id) {
-    text = document.getElementById(id).value; //value of the text input
+    var text = document.getElementById(id).value; //value of the text input
     var input = text.hexEncode();
     input = "0" + input;
     let XMLObject = document.getElementById('svg');
-    window.dispatchEvent(new Event("load"))
+    // window.dispatchEvent(new Event("load"))
     XMLObject.setAttributeNS("", 'data', `data/kanji/${input}.svg`);
     var dummySvg = document.getElementById('kvg:StrokePaths_dummy');
     if (dummySvg.firstChild || document.styleSheets.length > 1) {
-        resetDrawingBoard(dummySvg);
+        resetDrawingBoard(dummySvg, true);
     }
+    // Reset input box to empty after submit
+    document.getElementById(id).value = "";
 
     return false;
 }
 // External and Internal SVG file manipulation inspired by Peter Collingridge
 // in the following blog post: http://www.petercollingridge.co.uk/tutorials/svg/interactive/javascript/
 window.onload = function () {
+    // Update the current slider value (each time you drag the slider handle)
+    var slider = document.getElementById("myRange");
 
+    var output = document.getElementById("demo");
+
+    slider.oninput = function () {
+        output.innerHTML = this.value;
+    }
+    output.innerHTML = slider.value; // Display the default slider value
     // Only run the actual drawing of kanji characters when the 
     // window, along with the Javascript, and the external SVG
     // file have loaded
     document.getElementById("svg").addEventListener("load", function () {
+        var tooltip = document.getElementsByClassName("error-tooltip")[0];
+        tooltip.style.visibility = "hidden";
         // Load the external SVG file and get ID of requested kanji
         var XMLObject = document.getElementById('svg');
         var kanjiID = XMLObject.getAttribute('data').slice(11).replace(/\.[^/.]+$/, "")
         var svgObject = XMLObject.contentDocument;
+
         if (svgObject != null) {
             drawKanji(svgObject, kanjiID);
         }
     });
-    document.getElementById("svg").addEventListener("error", () => console.log("Please enter a valid kanji!"))
+    document.getElementById("svg").addEventListener("error", function () {
+        showErrorTooltip();
+    })
 }
 
 function drawKanji(svgObject, kanjiID) {
     var svg = svgObject.lastChild;
     // Hide original kanji such that only the animated one appears
-    svg.style.visibility = "hidden";
-
+    // svg.style.visibility = "hidden";
 
     var strokeNumbers = svgObject.getElementById(`kvg:StrokeNumbers_${kanjiID}`);
 
@@ -88,29 +113,49 @@ function drawKanji(svgObject, kanjiID) {
     var dummySvg = document.getElementById('kvg:StrokePaths_dummy');
 
     // Append each stroke individually and animate as they are added
-    var currTime = 0;
+
     var cssLeft = 2;
     var cssTop = 22.7;
     var style = document.createElement('style');
     style.innerHTML = "";
+
+    var slider = document.getElementById("myRange");
+
+    var output = document.getElementById("demo");
+
+    slider.oninput = function () {
+        output.innerHTML = this.value;
+
+        if (dummySvg.firstChild || document.styleSheets.length > 1) {
+            var XMLObject = document.getElementById('svg');
+
+            resetDrawingBoard(dummySvg, false);
+            XMLObject.setAttributeNS("", 'data', XMLObject.getAttributeNS("", "data"));
+            drawKanji(svgObject, kanjiID);
+        }
+    }
+    var time = slider.value;
+    var currTime = 0;
+    var animTime = (0.8 / 0.75) * time;
+
+
     // CSS animation of SVG heavily inspired by Jae Johns
     // in the following blog post: 
     // https://medium.theuxblog.com/the-ultimate-guide-to-animating-drawn-text-in-html-with-css-no-jquery-needed-bcdcfdb963d8
     for (var i = 0; i < paths.length; i++) {
+        // main kanji drawing panel
         currPath = paths[i]
         dummySvg.appendChild(paths[i]);
 
         var length = currPath.getTotalLength();
         currId = paths[i].id.replace(':', "\\:");
-        style.innerHTML += `#dummy-svg #${currId} {stroke-dasharray: ${length} ; stroke-dashoffset: ${length}; animation: anim-${currId} .75s linear ${currTime}s forwards;}`;
+        style.innerHTML += `#dummy-svg #${currId} {stroke-dasharray: ${length} ; stroke-dashoffset: ${length}; animation: anim-${currId} ${time}s linear ${currTime}s forwards;}`;
         style.innerHTML += `@keyframes anim-${currId} {from {stroke-dasharray: ${-length};} to {stroke-dashoffset: 0;} }`;
         document.body.appendChild(style);
-        currTime += 0.8;
+        currTime += animTime;
 
         // stroke panels
 
-        var div = document.createElement('div');
-        div.id = `panel_${i+1}`;
         var panelSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         panelSVG.id = `panel_${i+1}_SVG`;
         panelSVG.setAttribute("height", 109);
@@ -122,8 +167,9 @@ function drawKanji(svgObject, kanjiID) {
         groupElem.style = "fill:none;stroke: #000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round";
         panelSVG.appendChild(groupElem);
         panelSVG.firstChild.innerHTML = dummySvg.innerHTML;
+        // panelSVG.setAttribute("style", `position:fixed; width : 80px; height : 80px; top: ${cssTop}%; left: ${cssLeft}%; background-color: #00c9c8; border-radius : 7%; padding : 10px;`);
         panelSVG.setAttribute("style", `position:fixed; width : 80px; height : 80px; top: ${cssTop}%; left: ${cssLeft}%; background-color: #00c9c8; border-radius : 7%; padding : 10px;`);
-        // div.appendChild(panelSVG);
+
         // document.getElementById("kanji_table").appendChild(panelSVG);
         document.body.appendChild(panelSVG);
         cssLeft += 8;
